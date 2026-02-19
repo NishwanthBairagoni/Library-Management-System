@@ -1,0 +1,186 @@
+/* Landing Page Styles */
+.hero-section {
+     position: relative;
+     min-height: 90vh;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     overflow: hidden;
+     padding: var(--spacing-2xl) var(--spacing-md);
+     text-align: center;
+}
+
+.hero-bg {
+     position: absolute;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent 40%),
+          radial-gradient(circle at bottom left, rgba(236, 72, 153, 0.15), transparent 40%);
+     z-index: -1;
+}
+
+.hero-content {
+     max-width: 800px;
+     z-index: 10;
+}
+
+.hero-title {
+     font-size: 3.5rem;
+     font-weight: 700;
+     margin-bottom: var(--spacing-lg);
+     line-height: 1.2;
+     letter-spacing: -0.02em;
+}
+
+.hero-subtitle {
+     font-size: 1.25rem;
+     color: var(--color-text-secondary);
+     margin-bottom: var(--spacing-2xl);
+     max-width: 600px;
+     margin-left: auto;
+     margin-right: auto;
+}
+
+.features-section {
+     padding: var(--spacing-2xl) var(--spacing-md);
+     background: var(--color-bg-secondary);
+}
+
+.section-title {
+     text-align: center;
+     font-size: 2.5rem;
+     margin-bottom: var(--spacing-xl);
+}
+
+.feature-card {
+     padding: var(--spacing-xl);
+     transition: transform var(--transition-normal);
+     text-align: left;
+}
+
+.feature-card:hover {
+     transform: translateY(-5px);
+}
+
+.feature-icon {
+     font-size: 2.5rem;
+     margin-bottom: var(--spacing-md);
+     color: var(--color-accent-primary);
+}
+
+.role-selection-section {
+     padding: var(--spacing-2xl) var(--spacing-md);
+}
+
+.role-card {
+     padding: var(--spacing-xl);
+     text-align: center;
+     cursor: pointer;
+     transition: all var(--transition-normal);
+     border: 1px solid var(--glass-border);
+     background: rgba(30, 41, 59, 0.4);
+}
+
+.role-card:hover {
+     transform: translateY(-5px);
+     background: var(--glass-bg);
+     border-color: var(--color-accent-primary);
+     box-shadow: 0 10px 40px -10px rgba(99, 102, 241, 0.3);
+}
+
+.role-card h3 {
+     margin-bottom: var(--spacing-sm);
+     color: var(--color-text-primary);
+}
+
+.role-card p {
+     color: var(--color-text-secondary);
+     font-size: 0.9rem;
+}
+
+/* Navbar */
+.navbar {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     padding: var(--spacing-md) var(--spacing-xl);
+     position: sticky;
+     top: 0;
+     z-index: 100;
+     background: rgba(15, 23, 42, 0.8);
+     backdrop-filter: blur(10px);
+     border-bottom: 1px solid var(--glass-border);
+}
+
+.nav-brand {
+     font-family: var(--font-heading);
+     font-size: 1.5rem;
+     font-weight: 700;
+     color: var(--color-text-primary);
+     text-decoration: none;
+}
+
+.nav-links {
+     display: flex;
+     gap: var(--spacing-lg);
+}
+
+.nav-link {
+     color: var(--color-text-secondary);
+     text-decoration: none;
+     font-weight: 500;
+     transition: color var(--transition-fast);
+}
+
+.nav-link:hover {
+     color: var(--color-accent-primary);
+}
+
+/* Footer */
+.footer {
+     padding: var(--spacing-xl);
+     text-align: center;
+     background: var(--color-bg-secondary);
+     color: var(--color-text-muted);
+     font-size: 0.9rem;
+     border-top: 1px solid var(--glass-border);
+}
+
+@media (max-width: 768px) {
+     .hero-title {
+          font-size: 2.5rem;
+     }
+}
+
+/* Grid Utilities */
+.grid-cols-3 {
+     display: grid;
+     grid-template-columns: repeat(3, 1fr);
+     gap: var(--spacing-lg);
+}
+
+.grid-cols-4 {
+     display: grid;
+     grid-template-columns: repeat(4, 1fr);
+     gap: var(--spacing-lg);
+}
+
+.grid-cols-2 {
+     display: grid;
+     grid-template-columns: repeat(2, 1fr);
+     gap: var(--spacing-lg);
+}
+
+@media (max-width: 1024px) {
+     .grid-cols-3, .grid-cols-4 {
+          grid-template-columns: repeat(2, 1fr);
+     }
+}
+
+@media (max-width: 768px) {
+     .grid-cols-3, .grid-cols-4, .grid-cols-2 {
+          grid-template-columns: 1fr;
+     }
+}

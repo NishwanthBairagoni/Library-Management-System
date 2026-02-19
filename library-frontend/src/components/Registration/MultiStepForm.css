@@ -1,0 +1,102 @@
+.multi-step-form-container {
+     max-width: 800px;
+     margin: 2rem auto;
+     padding: 2rem;
+     background-color: #fff;
+     border-radius: 8px;
+     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.form-title {
+     text-align: center;
+     color: #333;
+     margin-bottom: 2rem;
+}
+
+.step-content {
+     min-height: 300px;
+     margin-bottom: 2rem;
+     padding: 1rem;
+     border: 1px solid #f0f0f0;
+     border-radius: 8px;
+     background-color: #fafafa;
+}
+
+.form-navigation {
+     display: flex;
+     justify-content: space-between;
+     margin-top: 1rem;
+}
+
+.nav-btn {
+     padding: 10px 24px;
+     border: none;
+     border-radius: 4px;
+     cursor: pointer;
+     font-size: 1rem;
+     transition: background-color 0.2s;
+}
+
+.back-btn {
+     background-color: #e0e0e0;
+     color: #333;
+}
+
+.back-btn:hover:not(:disabled) {
+     background-color: #d0d0d0;
+}
+
+.back-btn:disabled {
+     opacity: 0.5;
+     cursor: not-allowed;
+}
+
+.next-btn {
+     background-color: #007bff;
+     color: white;
+}
+
+.next-btn:hover {
+     background-color: #0056b3;
+}
+
+/* Common form styles */
+.form-group {
+     margin-bottom: 1rem;
+     display: flex;
+     flex-direction: column;
+}
+
+.form-group label {
+     margin-bottom: 0.5rem;
+     font-weight: 500;
+     color: #555;
+     text-align: left;
+}
+
+.form-group input,
+.form-group select {
+     padding: 10px;
+     border: 1px solid #ddd;
+     border-radius: 4px;
+     font-size: 1rem;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+     outline: none;
+     border-color: #007bff;
+     box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+.form-grid {
+     display: grid;
+     grid-template-columns: 1fr 1fr;
+     gap: 1.5rem;
+}
+
+@media (max-width: 600px) {
+     .form-grid {
+          grid-template-columns: 1fr;
+     }
+}
