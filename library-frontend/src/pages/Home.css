@@ -12,10 +12,12 @@
   background: linear-gradient(135deg, #f4f6f8, #e2e6ea);
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   text-align: center;
   position: relative;
+  padding: 50px 20px 80px 20px;
+  box-sizing: border-box;
 }
 
 /* Title */

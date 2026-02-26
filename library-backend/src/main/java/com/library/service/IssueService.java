@@ -23,7 +23,7 @@ public class IssueService {
     @Autowired
     private UserRepository userRepository;
 
-    public Issue issueBook(Long userId, Long bookId) {
+    public Issue issueBook(String userId, String bookId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Book book = bookRepository.findById(bookId)
@@ -54,25 +54,15 @@ public class IssueService {
         return issueRepository.save(issue);
     }
 
-    public Issue returnBook(Long bookId) {
+    public Issue returnBook(String bookId) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new RuntimeException("Book not found"));
 
-        // Find active issue for this book
-        // NOTE: This assumes a book instance is unique or tracking by ISBN?
-        // With current Book entity having 'quantity', we can't distinguish individual copies.
-        // We need to find *who* is returning it, or just find *an* issued record for this book.
-        // For this simple project, we'll assume we return by Issue ID or we just find the first issued instance of this book.
-        // BETTER: Return by Issue ID. Frontend should verify existing issue.
-        // BUT: Requirements usually imply scanning a book.
-        // Let's Find specific issue by book id and status ISSUED.
-        // Limitation: If multiple people borrowed "Harry Potter", we don't know which one this is without User ID.
-        // Let's assume the Librarian selects the Issue record or provides Student ID + Book ID.
-
-        throw new RuntimeException("Please use returnBook(Long issueId) or provide Student ID");
+        
+        throw new RuntimeException("Please use returnBook(String issueId) or provide Student ID");
     }
 
-    public Issue returnBook(Long userId, Long bookId) {
+    public Issue returnBook(String userId, String bookId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Book book = bookRepository.findById(bookId)
@@ -87,10 +77,10 @@ public class IssueService {
         issueToReturn.setActualReturnDate(LocalDate.now());
         issueToReturn.setStatus("RETURNED");
 
-        // Calculate fine (simple logic)
+        
         if (issueToReturn.getActualReturnDate().isAfter(issueToReturn.getReturnDate())) {
             long overdueDays = java.time.temporal.ChronoUnit.DAYS.between(issueToReturn.getReturnDate(), issueToReturn.getActualReturnDate());
-            issueToReturn.setFine(overdueDays * 1.0); // $1 per day
+            issueToReturn.setFine(overdueDays * 1.0); 
         }
 
         book.setQuantity(book.getQuantity() + 1);
@@ -103,7 +93,7 @@ public class IssueService {
         return issueRepository.findAll();
     }
 
-    public List<Issue> getUserHistory(Long userId) {
+    public List<Issue> getUserHistory(String userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         return issueRepository.findByUser(user);
     }

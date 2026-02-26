@@ -15,7 +15,7 @@ const UserDetails = () => {
                 const pendingResponse = await getPendingUsers();
                 const approvedResponse = await getApprovedUsers();
 
-                const foundUser = [...pendingResponse.data, ...approvedResponse.data].find(u => u.id === parseInt(userId));
+                const foundUser = [...pendingResponse.data, ...approvedResponse.data].find(u => String(u.id) === String(userId));
 
                 setUser(foundUser);
                 setLoading(false);

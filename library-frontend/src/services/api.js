@@ -56,6 +56,10 @@ export const deleteUser = (userId) => {
     return api.delete(`/admin/users/${userId}`);
 };
 
+export const assignMembership = (userId, planId) => {
+    return api.put(`/admin/users/${userId}/membership/${planId}`);
+};
+
 // Book APIs
 export const getAllBooks = () => {
     return api.get('/books');

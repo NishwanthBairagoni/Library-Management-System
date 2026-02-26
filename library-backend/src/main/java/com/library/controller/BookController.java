@@ -16,12 +16,12 @@ public class BookController {
     private BookService bookService;
 
     @GetMapping
-    public List<Book> getAllBooks() {
-        return bookService.getAllBooks();
+    public ResponseEntity<List<Book>> getAllBooks() {
+        return ResponseEntity.ok(bookService.getAllBooks());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Book> getBookById(@PathVariable Long id) {
+    public ResponseEntity<Book> getBookById(@PathVariable String id) {
         Optional<Book> book = bookService.getBookById(id);
         return book.map(ResponseEntity::ok)
                    .orElse(ResponseEntity.notFound().build());
@@ -38,7 +38,7 @@ public class BookController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateBook(@PathVariable Long id, @RequestBody Book bookDetails) {
+    public ResponseEntity<?> updateBook(@PathVariable String id, @RequestBody Book bookDetails) {
         try {
             Book updatedBook = bookService.updateBook(id, bookDetails);
             return ResponseEntity.ok(updatedBook);
@@ -48,7 +48,7 @@ public class BookController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBook(@PathVariable Long id) {
+    public ResponseEntity<?> deleteBook(@PathVariable String id) {
         try {
             bookService.deleteBook(id);
             return ResponseEntity.ok().build();

@@ -3,7 +3,7 @@ import LoginForm from '../../components/Login/LoginForm';
 
 const LibrarianLogin = () => {
      return (
-          <div>
+          <div className="auth-layout">
                <LoginForm role="Librarian" />
           </div>
      );

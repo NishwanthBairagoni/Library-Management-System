@@ -6,12 +6,12 @@ import lombok.Data;
 public class RegisterRequest {
     private String email;
     private String password;
-    private String role; // STUDENT, LIBRARIAN, USER
+    private String role; 
     private String name;
     private String phoneNumber;
     private String address;
-    private String department; // For Student
-    private String employeeId; // For Librarian
+    private String department; 
+    private String employeeId; 
 
     private String gender;
     private String maritalStatus;

@@ -3,8 +3,8 @@ import MultiStepForm from '../../components/Registration/MultiStepForm';
 
 const StudentRegister = () => {
      return (
-          <div>
-               <MultiStepForm />
+          <div className="auth-layout">
+               <MultiStepForm role="STUDENT" />
           </div>
      );
 };

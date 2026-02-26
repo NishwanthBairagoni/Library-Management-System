@@ -8,7 +8,7 @@ import WorkExperience from './Steps/WorkExperience';
 import UploadDocuments from './Steps/UploadDocuments';
 import './MultiStepForm.css';
 
-const MultiStepForm = () => {
+const MultiStepForm = ({ role = "STUDENT" }) => {
      const navigate = useNavigate();
      const [currentStep, setCurrentStep] = useState(0);
      const steps = ["Personal Details", "Address", "Academic Info", "Work Experience", "Upload ID"];
@@ -24,7 +24,7 @@ const MultiStepForm = () => {
                maritalStatus: "",
                department: "",
                employeeId: "",
-               role: ""
+               role: role
           },
           address: {
                street: "",

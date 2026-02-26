@@ -3,7 +3,7 @@ import LoginForm from '../../components/Login/LoginForm';
 
 const StudentLogin = () => {
      return (
-          <div>
+          <div className="auth-layout">
                <LoginForm role="Student" />
           </div>
      );

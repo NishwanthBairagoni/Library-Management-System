@@ -3,8 +3,8 @@ import MultiStepForm from '../../components/Registration/MultiStepForm';
 
 const AdminRegister = () => {
     return (
-        <div>
-            <MultiStepForm />
+        <div className="auth-layout">
+            <MultiStepForm role="ADMIN" />
         </div>
     );
 };

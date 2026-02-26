@@ -1,23 +1,22 @@
 package com.library.model;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
-@Entity
+@Document(collection = "librarians")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "librarians")
 public class Librarian {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @DBRef
     private User user;
 
     private String name;

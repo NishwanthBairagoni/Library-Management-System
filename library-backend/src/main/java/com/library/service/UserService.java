@@ -21,6 +21,9 @@ public class UserService {
     @Autowired
     private com.library.repository.LibrarianRepository librarianRepository;
 
+    @Autowired
+    private com.library.repository.MembershipPlanRepository membershipPlanRepository;
+
     public User registerUser(com.library.dto.RegisterRequest request) {
         Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
         if (existingUser.isPresent()) {
@@ -50,7 +53,7 @@ public class UserService {
         if (request.getAcademicInfoList() != null) {
             java.util.List<com.library.model.AcademicDetails> academicDetails = request.getAcademicInfoList().stream().map(dto -> {
                 com.library.model.AcademicDetails details = new com.library.model.AcademicDetails();
-                details.setUser(user);
+                
                 details.setLevel(dto.getLevel());
                 details.setInstitution(dto.getInstitution());
                 details.setPassingYear(dto.getPassingYear());
@@ -64,7 +67,7 @@ public class UserService {
         if (request.getWorkExperienceList() != null) {
             java.util.List<com.library.model.WorkExperience> workExperience = request.getWorkExperienceList().stream().map(dto -> {
                 com.library.model.WorkExperience exp = new com.library.model.WorkExperience();
-                exp.setUser(user);
+                
                 exp.setCompany(dto.getCompany());
                 exp.setRole(dto.getRole());
                 exp.setDuration(dto.getDuration());
@@ -116,13 +119,13 @@ public class UserService {
                 .collect(java.util.stream.Collectors.toList());
     }
 
-    public void approveUser(Long userId) {
+    public void approveUser(String userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         user.setStatus("APPROVED");
         userRepository.save(user);
     }
 
-    public void rejectUser(Long userId) {
+    public void rejectUser(String userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         user.setStatus("REJECTED");
         userRepository.save(user);
@@ -133,7 +136,21 @@ public class UserService {
                 .collect(java.util.stream.Collectors.toList());
     }
 
-    public void deleteUser(Long userId) {
+    public void deleteUser(String userId) {
         userRepository.deleteById(userId);
+    }
+
+    public void assignMembership(String userId, String planId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        com.library.model.MembershipPlan plan = membershipPlanRepository.findById(planId)
+                .orElseThrow(() -> new RuntimeException("Membership Plan not found"));
+
+        user.setMembershipType(plan.getName());
+        // Defaulting to 1 month from now for plan expiry as per standard monthly plans
+        user.setMembershipExpiry(java.time.LocalDate.now().plusMonths(1));
+        
+        userRepository.save(user);
     }
 }

@@ -18,6 +18,7 @@ const LandingPage = () => {
                          <p className="hero-subtitle">
                               Experience a seamless, digital library ecosystem. Manage books, track inventory, and empower students with our next-gen platform.
                          </p>
+
                          <div className="flex-center" style={{ gap: '1rem' }}>
                               <a href="#roles" className="btn-primary">Get Started</a>
                               <a href="#features" className="nav-link" style={{ padding: '0.75rem 1.5rem' }}>Learn More</a>

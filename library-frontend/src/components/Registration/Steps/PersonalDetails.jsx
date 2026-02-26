@@ -60,15 +60,15 @@ const PersonalDetails = ({ data, handleChange }) => {
                     </div>
                     <div className="form-group">
                          <label>Role</label>
-                         <select
-                              value={data.role}
-                              onChange={(e) => handleChange('personalDetails', 'role', e.target.value)}
-                         >
-                              <option value="">Select Role</option>
-                              <option value="STUDENT">Student</option>
-                              <option value="LIBRARIAN">Librarian</option>
-                              <option value="ADMIN">Admin</option>
-                         </select>
+                         <p style={{
+                              padding: '0.8rem',
+                              background: 'rgba(255,255,255,0.1)',
+                              borderRadius: '4px',
+                              color: 'var(--color-text-secondary)',
+                              margin: 0
+                         }}>
+                              You are registering as a <strong>{data.role}</strong>. This cannot be changed here.
+                         </p>
                     </div>
 
                     <div className="form-group">

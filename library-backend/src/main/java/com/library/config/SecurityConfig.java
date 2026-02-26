@@ -20,7 +20,7 @@ public class SecurityConfig {
             .cors(Customizer.withDefaults()) // Enable CORS
             .csrf(AbstractHttpConfigurer::disable) // Disable CSRF for API usage
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/h2-console/**", "/api/admin/**", "/api/books/**", "/api/issues/**", "/api/dashboard/**").permitAll() // Allow all for dev
+                .requestMatchers("/api/auth/**", "/h2-console/**", "/api/admin/**", "/api/books/**", "/api/issues/**", "/api/dashboard/**", "/api/memberships/**").permitAll() // Allow all for dev
                 .anyRequest().authenticated() // All other requests require authentication
             )
             .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable())); // Allow H2 frame

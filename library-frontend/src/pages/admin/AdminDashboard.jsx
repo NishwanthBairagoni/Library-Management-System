@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/Dashboard.css';
 import { getPendingUsers, approveUser, rejectUser, getApprovedUsers, deleteUser, getAllBooks, deleteBook, addBook, updateBook, getDashboardStats } from '../../services/api';
+import MembershipManagement from './MembershipManagement';
 
 const AdminDashboard = () => {
      const [activeTab, setActiveTab] = useState('overview');
@@ -13,7 +14,9 @@ const AdminDashboard = () => {
      const [showAddBook, setShowAddBook] = useState(false);
      const [isEditing, setIsEditing] = useState(false);
      const [currentBookId, setCurrentBookId] = useState(null);
-     const [newBook, setNewBook] = useState({ title: '', author: '', isbn: '', quantity: 1, genre: '', publisher: '' });
+     const [newBook, setNewBook] = useState({ title: '', author: '', isbn: '', quantity: 1, category: '', publisher: '', publicationYear: '', language: '', price: '' });
+     const [searchQuery, setSearchQuery] = useState('');
+     const [filterAttribute, setFilterAttribute] = useState('category');
 
      const navigate = useNavigate();
 
@@ -95,7 +98,7 @@ const AdminDashboard = () => {
                     await addBook(newBook);
                     alert("Book added successfully!");
                }
-               setNewBook({ title: '', author: '', isbn: '', quantity: 1, genre: '', publisher: '' });
+               setNewBook({ title: '', author: '', isbn: '', quantity: 1, category: '', publisher: '', publicationYear: '', language: '', price: '' });
                setShowAddBook(false);
                setIsEditing(false);
                setCurrentBookId(null);
@@ -112,12 +115,12 @@ const AdminDashboard = () => {
                title: book.title,
                author: book.author,
                isbn: book.isbn,
-               title: book.title,
-               author: book.author,
-               isbn: book.isbn,
                quantity: book.quantity,
-               genre: book.genre || '',
-               publisher: book.publisher || ''
+               category: book.category || '',
+               publisher: book.publisher || '',
+               publicationYear: book.publicationYear || '',
+               language: book.language || '',
+               price: book.price || ''
           });
           setCurrentBookId(book.id);
           setIsEditing(true);
@@ -129,12 +132,12 @@ const AdminDashboard = () => {
                setShowAddBook(false);
                setIsEditing(false);
                setCurrentBookId(null);
-               setNewBook({ title: '', author: '', isbn: '', quantity: 1, genre: '', publisher: '' });
+               setNewBook({ title: '', author: '', isbn: '', quantity: 1, category: '', publisher: '', publicationYear: '', language: '', price: '' });
           } else {
                setShowAddBook(true);
                setIsEditing(false);
                setCurrentBookId(null);
-               setNewBook({ title: '', author: '', isbn: '', quantity: 1, genre: '', publisher: '' });
+               setNewBook({ title: '', author: '', isbn: '', quantity: 1, category: '', publisher: '', publicationYear: '', language: '', price: '' });
           }
      };
 
@@ -180,6 +183,13 @@ const AdminDashboard = () => {
      };
 
      const renderContent = () => {
+          const filteredBooks = books.filter(book => {
+               if (!searchQuery) return true;
+               const value = book[filterAttribute];
+               if (value == null) return false;
+               return value.toString().toLowerCase().includes(searchQuery.toLowerCase());
+          });
+
           switch (activeTab) {
                case 'users':
                     return (
@@ -301,73 +311,126 @@ const AdminDashboard = () => {
                               </div>
 
                               {showAddBook && (
-                                   <form onSubmit={handleAddBook} className="glass-panel" style={{ marginBottom: '1rem', padding: '1rem' }}>
-                                        <h4 style={{ marginBottom: '1rem' }}>{isEditing ? 'Edit Book' : 'Add New Book'}</h4>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                             <input
-                                                  type="text"
-                                                  placeholder="Title"
-                                                  value={newBook.title}
-                                                  onChange={(e) => setNewBook({ ...newBook, title: e.target.value })}
-                                                  required
-                                                  className="input-field"
-                                                  style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)', borderRadius: '4px' }}
-                                             />
-                                             <input
-                                                  type="text"
-                                                  placeholder="Author"
-                                                  value={newBook.author}
-                                                  onChange={(e) => setNewBook({ ...newBook, author: e.target.value })}
-                                                  required
-                                                  className="input-field"
-                                                  style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)', borderRadius: '4px' }}
-                                             />
-                                             <input
-                                                  type="text"
-                                                  placeholder="ISBN"
-                                                  value={newBook.isbn}
-                                                  onChange={(e) => setNewBook({ ...newBook, isbn: e.target.value })}
-                                                  required
-                                                  className="input-field"
-                                                  style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)', borderRadius: '4px' }}
-                                             />
-                                             <input
-                                                  type="text"
-                                                  placeholder="Genre"
-                                                  value={newBook.genre}
-                                                  onChange={(e) => setNewBook({ ...newBook, genre: e.target.value })}
-                                                  className="input-field"
-                                                  style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)', borderRadius: '4px' }}
-                                             />
-                                             <input
-                                                  type="text"
-                                                  placeholder="Publisher"
-                                                  value={newBook.publisher}
-                                                  onChange={(e) => setNewBook({ ...newBook, publisher: e.target.value })}
-                                                  className="input-field"
-                                                  style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)', borderRadius: '4px' }}
-                                             />
-                                             <input
-                                                  type="number"
-                                                  placeholder="Quantity"
-                                                  value={newBook.quantity}
-                                                  onChange={(e) => setNewBook({ ...newBook, quantity: parseInt(e.target.value) })}
-                                                  min="1"
-                                                  required
-                                                  className="input-field"
-                                                  style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)', borderRadius: '4px' }}
-                                             />
+                                   <div className="modal-overlay">
+                                        <div className="modal-content glass-panel">
+                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                                  <h4>{isEditing ? 'Edit Book' : 'Add New Book'}</h4>
+                                                  <button onClick={toggleAddBook} style={{ background: 'none', border: 'none', color: 'white', fontSize: '1.5rem', cursor: 'pointer' }}>&times;</button>
+                                             </div>
+                                             <form onSubmit={handleAddBook}>
+                                                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                                       <input
+                                                            type="text"
+                                                            placeholder="Title"
+                                                            value={newBook.title}
+                                                            onChange={(e) => setNewBook({ ...newBook, title: e.target.value })}
+                                                            required
+                                                            className="input-field"
+                                                            style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)', borderRadius: '4px' }}
+                                                       />
+                                                       <input
+                                                            type="text"
+                                                            placeholder="Author"
+                                                            value={newBook.author}
+                                                            onChange={(e) => setNewBook({ ...newBook, author: e.target.value })}
+                                                            required
+                                                            className="input-field"
+                                                            style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)', borderRadius: '4px' }}
+                                                       />
+                                                       <input
+                                                            type="text"
+                                                            placeholder="ISBN"
+                                                            value={newBook.isbn}
+                                                            onChange={(e) => setNewBook({ ...newBook, isbn: e.target.value })}
+                                                            required
+                                                            className="input-field"
+                                                            style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)', borderRadius: '4px' }}
+                                                       />
+                                                       <input
+                                                            type="text"
+                                                            placeholder="Category"
+                                                            value={newBook.category}
+                                                            onChange={(e) => setNewBook({ ...newBook, category: e.target.value })}
+                                                            className="input-field"
+                                                            style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)', borderRadius: '4px' }}
+                                                       />
+                                                       <input
+                                                            type="text"
+                                                            placeholder="Publisher"
+                                                            value={newBook.publisher}
+                                                            onChange={(e) => setNewBook({ ...newBook, publisher: e.target.value })}
+                                                            className="input-field"
+                                                            style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)', borderRadius: '4px' }}
+                                                       />
+                                                       <input
+                                                            type="number"
+                                                            placeholder="Publication Year"
+                                                            value={newBook.publicationYear}
+                                                            onChange={(e) => setNewBook({ ...newBook, publicationYear: parseInt(e.target.value) || '' })}
+                                                            className="input-field"
+                                                            style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)', borderRadius: '4px' }}
+                                                       />
+                                                       <input
+                                                            type="text"
+                                                            placeholder="Language"
+                                                            value={newBook.language}
+                                                            onChange={(e) => setNewBook({ ...newBook, language: e.target.value })}
+                                                            className="input-field"
+                                                            style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)', borderRadius: '4px' }}
+                                                       />
+                                                       <input
+                                                            type="number"
+                                                            placeholder="Price"
+                                                            value={newBook.price}
+                                                            onChange={(e) => setNewBook({ ...newBook, price: parseFloat(e.target.value) || '' })}
+                                                            step="0.01"
+                                                            className="input-field"
+                                                            style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)', borderRadius: '4px' }}
+                                                       />
+                                                       <input
+                                                            type="number"
+                                                            placeholder="Quantity"
+                                                            value={newBook.quantity}
+                                                            onChange={(e) => setNewBook({ ...newBook, quantity: parseInt(e.target.value) || 0 })}
+                                                            min="1"
+                                                            required
+                                                            className="input-field"
+                                                            style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)', borderRadius: '4px' }}
+                                                       />
+                                                  </div>
+                                                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1.5rem' }}>
+                                                       <button type="button" onClick={toggleAddBook} style={{ padding: '0.8rem 1.5rem', background: 'rgba(255,255,255,0.1)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                                                            Cancel
+                                                       </button>
+                                                       <button type="submit" className="btn-primary" style={{ padding: '0.8rem 1.5rem' }}>
+                                                            {isEditing ? 'Update Book' : 'Save Book'}
+                                                       </button>
+                                                  </div>
+                                             </form>
                                         </div>
-                                        <button type="submit" className="btn-primary" style={{ marginTop: '1rem' }}>
-                                             {isEditing ? 'Update Book' : 'Save Book'}
-                                        </button>
-                                   </form>
+                                   </div>
                               )}
-                              <input
-                                   type="text"
-                                   placeholder="Search inventory..."
-                                   style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', color: 'white', marginBottom: '1rem', borderRadius: 'var(--radius-md)' }}
-                              />
+                              <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                                   <select
+                                        value={filterAttribute}
+                                        onChange={(e) => setFilterAttribute(e.target.value)}
+                                        className="input-field"
+                                        style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--glass-border)', borderRadius: 'var(--radius-md)', minWidth: '150px' }}
+                                   >
+                                        <option value="category" style={{ color: 'black' }}>Category</option>
+                                        <option value="title" style={{ color: 'black' }}>Title</option>
+                                        <option value="author" style={{ color: 'black' }}>Author</option>
+                                        <option value="isbn" style={{ color: 'black' }}>ISBN</option>
+                                        <option value="publisher" style={{ color: 'black' }}>Publisher</option>
+                                   </select>
+                                   <input
+                                        type="text"
+                                        placeholder={`Search by ${filterAttribute}...`}
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        style={{ flex: 1, padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', color: 'white', borderRadius: 'var(--radius-md)' }}
+                                   />
+                              </div>
                               <div className="table-container">
                                    {loading ? <p>Loading...</p> : (
                                         <table>
@@ -377,24 +440,30 @@ const AdminDashboard = () => {
                                                        <th>ISBN</th>
                                                        <th>Title</th>
                                                        <th>Author</th>
-                                                       <th>Genre</th>
+                                                       <th>Category</th>
                                                        <th>Publisher</th>
+                                                       <th>Year</th>
+                                                       <th>Lang</th>
+                                                       <th>Price</th>
                                                        <th>Stock</th>
                                                        <th>Actions</th>
                                                   </tr>
                                              </thead>
                                              <tbody>
-                                                  {books.length === 0 ? (
-                                                       <tr><td colSpan="8">No books found.</td></tr>
+                                                  {filteredBooks.length === 0 ? (
+                                                       <tr><td colSpan="11" style={{ textAlign: 'center' }}>No books found matching criteria.</td></tr>
                                                   ) : (
-                                                       books.map(book => (
+                                                       filteredBooks.map(book => (
                                                             <tr key={book.id}>
                                                                  <td>#B-{book.id}</td>
                                                                  <td>{book.isbn}</td>
                                                                  <td>{book.title}</td>
                                                                  <td>{book.author}</td>
-                                                                 <td>{book.genre || '-'}</td>
+                                                                 <td>{book.category || '-'}</td>
                                                                  <td>{book.publisher || '-'}</td>
+                                                                 <td>{book.publicationYear || '-'}</td>
+                                                                 <td>{book.language || '-'}</td>
+                                                                 <td>{book.price ? `$${book.price}` : '-'}</td>
                                                                  <td>{book.quantity}</td>
                                                                  <td>
                                                                       <button
@@ -438,7 +507,16 @@ const AdminDashboard = () => {
                               </div>
                          </section>
                     );
+               case 'memberships':
+                    return <MembershipManagement />;
                default:
+                    const totalStats = stats.totalBooks + stats.activeIssues + stats.overdueBooks;
+                    const getPercentage = (val) => totalStats > 0 ? `${(val / totalStats * 100).toFixed(0)}%` : '0%';
+
+                    const totalPlatform = stats.totalUsers + stats.totalBooks;
+                    const usersPercentage = totalPlatform > 0 ? `${(stats.totalUsers / totalPlatform * 100).toFixed(0)}%` : '0%';
+                    const booksPercentage = totalPlatform > 0 ? `${(stats.totalBooks / totalPlatform * 100).toFixed(0)}%` : '0%';
+
                     return (
                          <>
                               <section className="stats-grid">
@@ -461,6 +539,93 @@ const AdminDashboard = () => {
                                         <div className="stat-label">Overdue</div>
                                         <div className="stat-value text-error" style={{ color: 'var(--color-error)' }}>{stats.overdueBooks}</div>
                                         <div className="text-muted text-sm">Action needed</div>
+                                   </div>
+                              </section>
+
+                              <section className="charts-section glass-panel" style={{ padding: 'var(--spacing-lg)', marginBottom: 'var(--spacing-xl)' }}>
+                                   <h3 style={{ marginBottom: '1.5rem' }}>Dashboard Analytics</h3>
+                                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+                                        {/* Custom CSS Bar Chart */}
+                                        <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--glass-border)' }}>
+                                             <h4 style={{ marginBottom: '2rem', textAlign: 'center' }}>Book Inventory Status</h4>
+                                             <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'flex-end', height: '200px', paddingBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+
+                                                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '30%', height: '100%' }}>
+                                                       <span style={{ marginBottom: '0.5rem', fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)' }}>{stats.totalBooks}</span>
+                                                       <div style={{
+                                                            width: '100%',
+                                                            height: getPercentage(stats.totalBooks),
+                                                            background: 'linear-gradient(to top, #ef4444, #f87171)',
+                                                            borderRadius: '4px 4px 0 0',
+                                                            transition: 'height 1s ease'
+                                                       }}></div>
+                                                       <span style={{ marginTop: '0.5rem', fontSize: '0.8rem' }}>Total</span>
+                                                  </div>
+
+                                                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '30%', height: '100%' }}>
+                                                       <span style={{ marginBottom: '0.5rem', fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)' }}>{stats.activeIssues}</span>
+                                                       <div style={{
+                                                            width: '100%',
+                                                            height: getPercentage(stats.activeIssues),
+                                                            background: 'linear-gradient(to top, #10b981, #34d399)',
+                                                            borderRadius: '4px 4px 0 0',
+                                                            transition: 'height 1s ease'
+                                                       }}></div>
+                                                       <span style={{ marginTop: '0.5rem', fontSize: '0.8rem' }}>Issued</span>
+                                                  </div>
+
+                                                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '30%', height: '100%' }}>
+                                                       <span style={{ marginBottom: '0.5rem', fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)' }}>{stats.overdueBooks}</span>
+                                                       <div style={{
+                                                            width: '100%',
+                                                            height: getPercentage(stats.overdueBooks),
+                                                            background: 'linear-gradient(to top, #f97316, #fdba74)',
+                                                            borderRadius: '4px 4px 0 0',
+                                                            transition: 'height 1s ease'
+                                                       }}></div>
+                                                       <span style={{ marginTop: '0.5rem', fontSize: '0.8rem' }}>Overdue</span>
+                                                  </div>
+
+                                             </div>
+                                        </div>
+
+                                        {/* SVG Circle Bar Chart */}
+                                        <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--glass-border)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                                             <h4 style={{ marginBottom: '2rem', textAlign: 'center' }}>System Composition</h4>
+
+                                             <div style={{ display: 'flex', justifyContent: 'center', width: '100%', marginBottom: '2rem' }}>
+                                                  <svg width="180" height="180" viewBox="0 0 180 180" style={{ filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.3))' }}>
+                                                       {/* Background circles */}
+                                                       <circle cx="90" cy="90" r="70" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="16" />
+                                                       <circle cx="90" cy="90" r="46" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="16" />
+
+                                                       {/* Books (Outer Ring) */}
+                                                       <circle cx="90" cy="90" r="70" fill="none" stroke="#ef4444" strokeWidth="16"
+                                                            strokeDasharray={2 * Math.PI * 70}
+                                                            strokeDashoffset={2 * Math.PI * 70 * (1 - (parseFloat(booksPercentage) || 0) / 100)}
+                                                            strokeLinecap="round" transform="rotate(-90 90 90)"
+                                                            style={{ transition: 'stroke-dashoffset 1.5s ease-in-out' }} />
+
+                                                       {/* Users (Inner Ring) */}
+                                                       <circle cx="90" cy="90" r="46" fill="none" stroke="#6366f1" strokeWidth="16"
+                                                            strokeDasharray={2 * Math.PI * 46}
+                                                            strokeDashoffset={2 * Math.PI * 46 * (1 - (parseFloat(usersPercentage) || 0) / 100)}
+                                                            strokeLinecap="round" transform="rotate(-90 90 90)"
+                                                            style={{ transition: 'stroke-dashoffset 1.5s ease-in-out' }} />
+                                                  </svg>
+                                             </div>
+
+                                             <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: '1rem' }}>
+                                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                       <div style={{ width: '15px', height: '15px', borderRadius: '50%', background: '#6366f1' }}></div>
+                                                       <span>Users ({stats.totalUsers}) - {usersPercentage}</span>
+                                                  </div>
+                                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                       <div style={{ width: '15px', height: '15px', borderRadius: '50%', background: '#ef4444' }}></div>
+                                                       <span>Books ({stats.totalBooks}) - {booksPercentage}</span>
+                                                  </div>
+                                             </div>
+                                        </div>
                                    </div>
                               </section>
 
@@ -507,6 +672,12 @@ const AdminDashboard = () => {
                               onClick={() => setActiveTab('reports')}
                          >
                               Reports
+                         </button>
+                         <button
+                              className={`nav-item ${activeTab === 'memberships' ? 'active' : ''}`}
+                              onClick={() => setActiveTab('memberships')}
+                         >
+                              Memberships
                          </button>
                          <a href="/" className="nav-item" style={{ marginTop: 'auto' }}>Logout</a>
                     </nav>

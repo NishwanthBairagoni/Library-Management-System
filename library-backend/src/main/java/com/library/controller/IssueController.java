@@ -15,7 +15,7 @@ public class IssueController {
     private IssueService issueService;
 
     @PostMapping("/issue")
-    public ResponseEntity<?> issueBook(@RequestParam Long userId, @RequestParam Long bookId) {
+    public ResponseEntity<?> issueBook(@RequestParam String userId, @RequestParam String bookId) {
         try {
             Issue issue = issueService.issueBook(userId, bookId);
             return ResponseEntity.ok(issue);
@@ -25,7 +25,7 @@ public class IssueController {
     }
 
     @PostMapping("/return")
-    public ResponseEntity<?> returnBook(@RequestParam Long userId, @RequestParam Long bookId) {
+    public ResponseEntity<?> returnBook(@RequestParam String userId, @RequestParam String bookId) {
         try {
             Issue issue = issueService.returnBook(userId, bookId);
             return ResponseEntity.ok(issue);
@@ -40,7 +40,7 @@ public class IssueController {
     }
 
     @GetMapping("/history/{userId}")
-    public ResponseEntity<List<Issue>> getUserHistory(@PathVariable Long userId) {
+    public ResponseEntity<List<Issue>> getUserHistory(@PathVariable String userId) {
         return ResponseEntity.ok(issueService.getUserHistory(userId));
     }
 }

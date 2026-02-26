@@ -42,29 +42,44 @@ const LoginForm = ({ role }) => {
 
      return (
           <div className="login-form-container">
-               <h2 className="login-title">{role} Login</h2>
+               <div className="login-logo">
+                    📚
+               </div>
+               <h2 className="login-title">Welcome Back</h2>
+               <p className="login-subtitle">Please enter your {role.toLowerCase()} details to sign in.</p>
+
                <form onSubmit={handleSubmit}>
                     <div className="form-group">
-                         <label>Email</label>
+                         <label>Email Address</label>
                          <input
                               type="email"
+                              className="form-input"
                               value={email}
                               onChange={(e) => setEmail(e.target.value)}
                               required
-                              placeholder="Enter your email"
+                              placeholder="e.g. user@example.com"
                          />
                     </div>
                     <div className="form-group">
                          <label>Password</label>
                          <input
                               type="password"
+                              className="form-input"
                               value={password}
                               onChange={(e) => setPassword(e.target.value)}
                               required
-                              placeholder="Enter your password"
+                              placeholder="••••••••"
                          />
                     </div>
-                    <button type="submit" className="login-btn">Login</button>
+
+                    <button type="submit" className="login-btn">Sign In as {role}</button>
+
+                    <div className="options-row">
+                         <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', color: '#64748b' }}>
+                              <input type="checkbox" style={{ cursor: 'pointer' }} /> Remember me
+                         </label>
+                         <a href="#" className="forgot-password">Forgot password?</a>
+                    </div>
 
                     <div className="register-link">
                          <p>Don't have an account? <Link to={`/${role.toLowerCase()}/register`}>Register here</Link></p>

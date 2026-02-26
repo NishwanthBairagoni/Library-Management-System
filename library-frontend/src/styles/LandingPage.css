@@ -16,8 +16,11 @@
      left: 0;
      width: 100%;
      height: 100%;
-     background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent 40%),
-          radial-gradient(circle at bottom left, rgba(236, 72, 153, 0.15), transparent 40%);
+     background: linear-gradient(rgba(15, 23, 42, 0.2), rgba(15, 23, 42, 0.4)),
+          url('https://miro.medium.com/v2/1*6Jp3vJWe7VFlFHZ9WhSJng.jpeg');
+     background-size: cover;
+     background-position: center;
+     background-repeat: no-repeat;
      z-index: -1;
 }
 
@@ -32,6 +35,8 @@
      margin-bottom: var(--spacing-lg);
      line-height: 1.2;
      letter-spacing: -0.02em;
+     color: #ffffff;
+     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .hero-subtitle {
@@ -41,6 +46,8 @@
      max-width: 600px;
      margin-left: auto;
      margin-right: auto;
+     color: #ffffff;
+     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .features-section {
@@ -174,13 +181,18 @@
 }
 
 @media (max-width: 1024px) {
-     .grid-cols-3, .grid-cols-4 {
+
+     .grid-cols-3,
+     .grid-cols-4 {
           grid-template-columns: repeat(2, 1fr);
      }
 }
 
 @media (max-width: 768px) {
-     .grid-cols-3, .grid-cols-4, .grid-cols-2 {
+
+     .grid-cols-3,
+     .grid-cols-4,
+     .grid-cols-2 {
           grid-template-columns: 1fr;
      }
 }

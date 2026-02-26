@@ -20,13 +20,13 @@ public class AdminController {
     }
 
     @PutMapping("/users/{userId}/approve")
-    public ResponseEntity<?> approveUser(@PathVariable Long userId) {
+    public ResponseEntity<?> approveUser(@PathVariable String userId) {
         userService.approveUser(userId);
         return ResponseEntity.ok("User approved successfully");
     }
 
     @PutMapping("/users/{userId}/reject")
-    public ResponseEntity<?> rejectUser(@PathVariable Long userId) {
+    public ResponseEntity<?> rejectUser(@PathVariable String userId) {
         userService.rejectUser(userId);
         return ResponseEntity.ok("User rejected successfully");
     }
@@ -36,8 +36,14 @@ public class AdminController {
     }
 
     @DeleteMapping("/users/{userId}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
+    public ResponseEntity<?> deleteUser(@PathVariable String userId) {
         userService.deleteUser(userId);
         return ResponseEntity.ok("User deleted successfully");
+    }
+
+    @PutMapping("/users/{userId}/membership/{planId}")
+    public ResponseEntity<?> assignMembership(@PathVariable String userId, @PathVariable String planId) {
+        userService.assignMembership(userId, planId);
+        return ResponseEntity.ok("Membership assigned successfully");
     }
 }

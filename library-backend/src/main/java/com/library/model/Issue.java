@@ -1,28 +1,26 @@
 package com.library.model;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.time.LocalDate;
 
-@Entity
+@Document(collection = "issues")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "issues")
 public class Issue {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @DBRef
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "book_id")
+    @DBRef
     private Book book;
 
     private LocalDate issueDate;
