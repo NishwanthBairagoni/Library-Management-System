@@ -8,15 +8,22 @@ const StudentDashboard = () => {
      const [history, setHistory] = useState([]);
      const [searchTerm, setSearchTerm] = useState('');
      const [selectedGenre, setSelectedGenre] = useState('');
+     const [searchPage, setSearchPage] = useState(1);
+     const [historyPage, setHistoryPage] = useState(1);
+     const [borrowsPage, setBorrowsPage] = useState(1);
+     const itemsPerPage = 10;
      const user = JSON.parse(localStorage.getItem('user')) || {};
 
      useEffect(() => {
+          setSearchPage(1);
+          setHistoryPage(1);
+          setBorrowsPage(1);
           if (activeTab === 'search') {
                fetchBooks();
           } else if (activeTab === 'history' || activeTab === 'dashboard') {
                if (user.id) fetchHistory(user.id);
           }
-     }, [activeTab]);
+     }, [activeTab, user.id]);
 
      const fetchBooks = async () => {
           try {
@@ -47,6 +54,24 @@ const StudentDashboard = () => {
      const genres = [...new Set(books.map(book => book.genre).filter(g => g))];
 
      const renderContent = () => {
+          const activeBorrows = history.filter(h => h.status === 'ISSUED');
+
+          // Pagination calculations
+          const indexOfLastSearch = searchPage * itemsPerPage;
+          const indexOfFirstSearch = indexOfLastSearch - itemsPerPage;
+          const currentSearchBooks = filteredBooks.slice(indexOfFirstSearch, indexOfLastSearch);
+          const totalSearchPages = Math.ceil(filteredBooks.length / itemsPerPage) || 1;
+
+          const indexOfLastHistory = historyPage * itemsPerPage;
+          const indexOfFirstHistory = indexOfLastHistory - itemsPerPage;
+          const currentHistory = history.slice(indexOfFirstHistory, indexOfLastHistory);
+          const totalHistoryPages = Math.ceil(history.length / itemsPerPage) || 1;
+
+          const indexOfLastBorrow = borrowsPage * itemsPerPage;
+          const indexOfFirstBorrow = indexOfLastBorrow - itemsPerPage;
+          const currentBorrows = activeBorrows.slice(indexOfFirstBorrow, indexOfLastBorrow);
+          const totalBorrowsPages = Math.ceil(activeBorrows.length / itemsPerPage) || 1;
+
           switch (activeTab) {
                case 'search':
                     return (
@@ -56,7 +81,10 @@ const StudentDashboard = () => {
                                    type="text"
                                    placeholder="Search for books, authors, or ISBN..."
                                    value={searchTerm}
-                                   onChange={(e) => setSearchTerm(e.target.value)}
+                                   onChange={(e) => {
+                                        setSearchTerm(e.target.value);
+                                        setSearchPage(1);
+                                   }}
                                    style={{
                                         width: '100%',
                                         padding: '1rem',
@@ -69,7 +97,10 @@ const StudentDashboard = () => {
                               />
                               <select
                                    value={selectedGenre}
-                                   onChange={(e) => setSelectedGenre(e.target.value)}
+                                   onChange={(e) => {
+                                        setSelectedGenre(e.target.value);
+                                        setSearchPage(1);
+                                   }}
                                    style={{
                                         width: '100%',
                                         padding: '1rem',
@@ -98,7 +129,7 @@ const StudentDashboard = () => {
                                              </tr>
                                         </thead>
                                         <tbody>
-                                             {filteredBooks.map(book => (
+                                             {currentSearchBooks.map(book => (
                                                   <tr key={book.id}>
                                                        <td>{book.title}</td>
                                                        <td>{book.author}</td>
@@ -111,6 +142,27 @@ const StudentDashboard = () => {
                                         </tbody>
                                    </table>
                               </div>
+                              {true && (
+                                   <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '1rem', gap: '1rem' }}>
+                                        <button
+                                             onClick={() => setSearchPage(prev => Math.max(prev - 1, 1))}
+                                             disabled={searchPage === 1}
+                                             style={{ padding: '0.4rem 0.8rem', opacity: searchPage === 1 ? 0.5 : 1, cursor: searchPage === 1 ? 'not-allowed' : 'pointer' }}
+                                             className="btn-primary"
+                                        >
+                                             Previous
+                                        </button>
+                                        <span>Page {searchPage} of {totalSearchPages}</span>
+                                        <button
+                                             onClick={() => setSearchPage(prev => Math.min(prev + 1, totalSearchPages))}
+                                             disabled={searchPage === totalSearchPages}
+                                             style={{ padding: '0.4rem 0.8rem', opacity: searchPage === totalSearchPages ? 0.5 : 1, cursor: searchPage === totalSearchPages ? 'not-allowed' : 'pointer' }}
+                                             className="btn-primary"
+                                        >
+                                             Next
+                                        </button>
+                                   </div>
+                              )}
                          </section>
                     );
                case 'history':
@@ -128,7 +180,7 @@ const StudentDashboard = () => {
                                              </tr>
                                         </thead>
                                         <tbody>
-                                             {history.map(issue => (
+                                             {currentHistory.map(issue => (
                                                   <tr key={issue.id}>
                                                        <td>{issue.book ? issue.book.title : issue.bookId}</td>
                                                        <td>{issue.issueDate}</td>
@@ -143,6 +195,27 @@ const StudentDashboard = () => {
                                         </tbody>
                                    </table>
                               </div>
+                              {true && (
+                                   <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '1rem', gap: '1rem' }}>
+                                        <button
+                                             onClick={() => setHistoryPage(prev => Math.max(prev - 1, 1))}
+                                             disabled={historyPage === 1}
+                                             style={{ padding: '0.4rem 0.8rem', opacity: historyPage === 1 ? 0.5 : 1, cursor: historyPage === 1 ? 'not-allowed' : 'pointer' }}
+                                             className="btn-primary"
+                                        >
+                                             Previous
+                                        </button>
+                                        <span>Page {historyPage} of {totalHistoryPages}</span>
+                                        <button
+                                             onClick={() => setHistoryPage(prev => Math.min(prev + 1, totalHistoryPages))}
+                                             disabled={historyPage === totalHistoryPages}
+                                             style={{ padding: '0.4rem 0.8rem', opacity: historyPage === totalHistoryPages ? 0.5 : 1, cursor: historyPage === totalHistoryPages ? 'not-allowed' : 'pointer' }}
+                                             className="btn-primary"
+                                        >
+                                             Next
+                                        </button>
+                                   </div>
+                              )}
                          </section>
                     );
                case 'profile':
@@ -190,7 +263,7 @@ const StudentDashboard = () => {
                                              </thead>
                                              <tbody>
                                                   {activeBorrows.length === 0 ? <tr><td colSpan="3">No active borrows.</td></tr> :
-                                                       activeBorrows.map(issue => (
+                                                       currentBorrows.map(issue => (
                                                             <tr key={issue.id}>
                                                                  <td>{issue.book ? issue.book.title : `Book #${issue.book.id}`}</td>
                                                                  <td>{issue.returnDate}</td>
@@ -201,6 +274,27 @@ const StudentDashboard = () => {
                                              </tbody>
                                         </table>
                                    </div>
+                                   {true && (
+                                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '1rem', gap: '1rem' }}>
+                                             <button
+                                                  onClick={() => setBorrowsPage(prev => Math.max(prev - 1, 1))}
+                                                  disabled={borrowsPage === 1}
+                                                  style={{ padding: '0.4rem 0.8rem', opacity: borrowsPage === 1 ? 0.5 : 1, cursor: borrowsPage === 1 ? 'not-allowed' : 'pointer' }}
+                                                  className="btn-primary"
+                                             >
+                                                  Previous
+                                             </button>
+                                             <span>Page {borrowsPage} of {totalBorrowsPages}</span>
+                                             <button
+                                                  onClick={() => setBorrowsPage(prev => Math.min(prev + 1, totalBorrowsPages))}
+                                                  disabled={borrowsPage === totalBorrowsPages}
+                                                  style={{ padding: '0.4rem 0.8rem', opacity: borrowsPage === totalBorrowsPages ? 0.5 : 1, cursor: borrowsPage === totalBorrowsPages ? 'not-allowed' : 'pointer' }}
+                                                  className="btn-primary"
+                                             >
+                                                  Next
+                                             </button>
+                                        </div>
+                                   )}
                               </section>
                          </>
                     );

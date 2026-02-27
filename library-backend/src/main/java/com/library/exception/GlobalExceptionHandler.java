@@ -10,7 +10,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.time.LocalDateTime;
-
+//In application custom excepion
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 

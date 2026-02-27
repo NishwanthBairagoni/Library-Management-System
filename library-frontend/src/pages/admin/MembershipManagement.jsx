@@ -9,6 +9,8 @@ const MembershipManagement = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [currentPlanId, setCurrentPlanId] = useState(null);
     const [error, setError] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     const [formData, setFormData] = useState({
         name: '',
@@ -140,7 +142,7 @@ const MembershipManagement = () => {
                 gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
                 gap: '2rem'
             }}>
-                {plans.map(plan => (
+                {plans.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map(plan => (
                     <div key={plan.id} className="glass-panel" style={{
                         padding: '2rem',
                         display: 'flex',
@@ -217,6 +219,26 @@ const MembershipManagement = () => {
                     </div>
                 ))}
             </div>
+
+            {true && (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '2rem', gap: '1rem' }}>
+                    <button
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        style={{ padding: '0.5rem 1rem', background: 'rgba(255,255,255,0.1)', color: 'white', border: '1px solid var(--glass-border)', borderRadius: '4px', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', opacity: currentPage === 1 ? 0.5 : 1 }}
+                    >
+                        Previous
+                    </button>
+                    <span style={{ color: 'white' }}>Page {currentPage} of {Math.ceil(plans.length / itemsPerPage)}</span>
+                    <button
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(plans.length / itemsPerPage)))}
+                        disabled={currentPage === Math.ceil(plans.length / itemsPerPage)}
+                        style={{ padding: '0.5rem 1rem', background: 'rgba(255,255,255,0.1)', color: 'white', border: '1px solid var(--glass-border)', borderRadius: '4px', cursor: currentPage === Math.ceil(plans.length / itemsPerPage) ? 'not-allowed' : 'pointer', opacity: currentPage === Math.ceil(plans.length / itemsPerPage) ? 0.5 : 1 }}
+                    >
+                        Next
+                    </button>
+                </div>
+            )}
 
             {showModal && (
                 <div className="modal-overlay" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>

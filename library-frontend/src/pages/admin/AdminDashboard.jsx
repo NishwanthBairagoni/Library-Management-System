@@ -17,10 +17,17 @@ const AdminDashboard = () => {
      const [newBook, setNewBook] = useState({ title: '', author: '', isbn: '', quantity: 1, category: '', publisher: '', publicationYear: '', language: '', price: '' });
      const [searchQuery, setSearchQuery] = useState('');
      const [filterAttribute, setFilterAttribute] = useState('category');
+     const [usersPage, setUsersPage] = useState(1);
+     const [requestsPage, setRequestsPage] = useState(1);
+     const [adminBooksPage, setAdminBooksPage] = useState(1);
+     const itemsPerPage = 10;
 
      const navigate = useNavigate();
 
      useEffect(() => {
+          setUsersPage(1);
+          setRequestsPage(1);
+          setAdminBooksPage(1);
           if (activeTab === 'users') {
                fetchApprovedUsers();
           } else if (activeTab === 'requests') {
@@ -190,6 +197,22 @@ const AdminDashboard = () => {
                return value.toString().toLowerCase().includes(searchQuery.toLowerCase());
           });
 
+          // Pagination calculations
+          const indexOfLastUser = usersPage * itemsPerPage;
+          const indexOfFirstUser = indexOfLastUser - itemsPerPage;
+          const currentUsers = approvedUsers.slice(indexOfFirstUser, indexOfLastUser);
+          const totalUsersPages = Math.ceil(approvedUsers.length / itemsPerPage) || 1;
+
+          const indexOfLastRequest = requestsPage * itemsPerPage;
+          const indexOfFirstRequest = indexOfLastRequest - itemsPerPage;
+          const currentRequests = pendingUsers.slice(indexOfFirstRequest, indexOfLastRequest);
+          const totalRequestsPages = Math.ceil(pendingUsers.length / itemsPerPage) || 1;
+
+          const indexOfLastBook = adminBooksPage * itemsPerPage;
+          const indexOfFirstBook = indexOfLastBook - itemsPerPage;
+          const currentAdminBooks = filteredBooks.slice(indexOfFirstBook, indexOfLastBook);
+          const totalAdminBooksPages = Math.ceil(filteredBooks.length / itemsPerPage) || 1;
+
           switch (activeTab) {
                case 'users':
                     return (
@@ -213,9 +236,9 @@ const AdminDashboard = () => {
                                              </thead>
                                              <tbody>
                                                   {approvedUsers.length === 0 ? (
-                                                       <tr><td colSpan="5">No active users found.</td></tr>
+                                                       <tr><td colSpan="6">No active users found.</td></tr>
                                                   ) : (
-                                                       approvedUsers.map(user => (
+                                                       currentUsers.map(user => (
                                                             <tr key={user.id}>
                                                                  <td>#U-{user.id}</td>
                                                                  <td>{user.email}</td>
@@ -237,6 +260,27 @@ const AdminDashboard = () => {
                                         </table>
                                    )}
                               </div>
+                              {true && (
+                                   <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '1rem', gap: '1rem' }}>
+                                        <button
+                                             onClick={() => setUsersPage(prev => Math.max(prev - 1, 1))}
+                                             disabled={usersPage === 1}
+                                             style={{ padding: '0.4rem 0.8rem', opacity: usersPage === 1 ? 0.5 : 1, cursor: usersPage === 1 ? 'not-allowed' : 'pointer' }}
+                                             className="btn-primary"
+                                        >
+                                             Previous
+                                        </button>
+                                        <span>Page {usersPage} of {totalUsersPages}</span>
+                                        <button
+                                             onClick={() => setUsersPage(prev => Math.min(prev + 1, totalUsersPages))}
+                                             disabled={usersPage === totalUsersPages}
+                                             style={{ padding: '0.4rem 0.8rem', opacity: usersPage === totalUsersPages ? 0.5 : 1, cursor: usersPage === totalUsersPages ? 'not-allowed' : 'pointer' }}
+                                             className="btn-primary"
+                                        >
+                                             Next
+                                        </button>
+                                   </div>
+                              )}
                          </section>
                     );
                case 'requests':
@@ -264,7 +308,7 @@ const AdminDashboard = () => {
                                                   {pendingUsers.length === 0 ? (
                                                        <tr><td colSpan="6">No pending requests found.</td></tr>
                                                   ) : (
-                                                       pendingUsers.map(user => (
+                                                       currentRequests.map(user => (
                                                             <tr key={user.id}>
                                                                  <td>#U-{user.id}</td>
                                                                  <td>{user.email}</td>
@@ -296,6 +340,27 @@ const AdminDashboard = () => {
                                                   )}
                                              </tbody>
                                         </table>
+                                   )}
+                                   {true && (
+                                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '1rem', gap: '1rem' }}>
+                                             <button
+                                                  onClick={() => setRequestsPage(prev => Math.max(prev - 1, 1))}
+                                                  disabled={requestsPage === 1}
+                                                  style={{ padding: '0.4rem 0.8rem', opacity: requestsPage === 1 ? 0.5 : 1, cursor: requestsPage === 1 ? 'not-allowed' : 'pointer' }}
+                                                  className="btn-primary"
+                                             >
+                                                  Previous
+                                             </button>
+                                             <span>Page {requestsPage} of {totalRequestsPages}</span>
+                                             <button
+                                                  onClick={() => setRequestsPage(prev => Math.min(prev + 1, totalRequestsPages))}
+                                                  disabled={requestsPage === totalRequestsPages}
+                                                  style={{ padding: '0.4rem 0.8rem', opacity: requestsPage === totalRequestsPages ? 0.5 : 1, cursor: requestsPage === totalRequestsPages ? 'not-allowed' : 'pointer' }}
+                                                  className="btn-primary"
+                                             >
+                                                  Next
+                                             </button>
+                                        </div>
                                    )}
                               </div>
                          </section>
@@ -427,7 +492,10 @@ const AdminDashboard = () => {
                                         type="text"
                                         placeholder={`Search by ${filterAttribute}...`}
                                         value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        onChange={(e) => {
+                                             setSearchQuery(e.target.value);
+                                             setAdminBooksPage(1);
+                                        }}
                                         style={{ flex: 1, padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', color: 'white', borderRadius: 'var(--radius-md)' }}
                                    />
                               </div>
@@ -453,7 +521,7 @@ const AdminDashboard = () => {
                                                   {filteredBooks.length === 0 ? (
                                                        <tr><td colSpan="11" style={{ textAlign: 'center' }}>No books found matching criteria.</td></tr>
                                                   ) : (
-                                                       filteredBooks.map(book => (
+                                                       currentAdminBooks.map(book => (
                                                             <tr key={book.id}>
                                                                  <td>#B-{book.id}</td>
                                                                  <td>{book.isbn}</td>
@@ -484,6 +552,27 @@ const AdminDashboard = () => {
                                                   )}
                                              </tbody>
                                         </table>
+                                   )}
+                                   {true && (
+                                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '1rem', gap: '1rem' }}>
+                                             <button
+                                                  onClick={() => setAdminBooksPage(prev => Math.max(prev - 1, 1))}
+                                                  disabled={adminBooksPage === 1}
+                                                  style={{ padding: '0.4rem 0.8rem', opacity: adminBooksPage === 1 ? 0.5 : 1, cursor: adminBooksPage === 1 ? 'not-allowed' : 'pointer' }}
+                                                  className="btn-primary"
+                                             >
+                                                  Previous
+                                             </button>
+                                             <span>Page {adminBooksPage} of {totalAdminBooksPages}</span>
+                                             <button
+                                                  onClick={() => setAdminBooksPage(prev => Math.min(prev + 1, totalAdminBooksPages))}
+                                                  disabled={adminBooksPage === totalAdminBooksPages}
+                                                  style={{ padding: '0.4rem 0.8rem', opacity: adminBooksPage === totalAdminBooksPages ? 0.5 : 1, cursor: adminBooksPage === totalAdminBooksPages ? 'not-allowed' : 'pointer' }}
+                                                  className="btn-primary"
+                                             >
+                                                  Next
+                                             </button>
+                                        </div>
                                    )}
                               </div>
                          </section>

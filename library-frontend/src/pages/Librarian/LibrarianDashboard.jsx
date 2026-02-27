@@ -10,17 +10,18 @@ const LibrarianDashboard = () => {
      const [stats, setStats] = useState({ totalUsers: 0, totalBooks: 0, activeIssues: 0 });
      const [activeIssuesList, setActiveIssuesList] = useState([]);
      const [issueData, setIssueData] = useState({ studentId: '', bookId: '' });
-     const [returnData, setReturnData] = useState({ bookId: '', studentId: '' }); // Added studentId for robust return
      const [searchQuery, setSearchQuery] = useState('');
      const [filterAttribute, setFilterAttribute] = useState('category');
-     const [pendingUsers, setPendingUsers] = useState([]);
      const [approvedUsers, setApprovedUsers] = useState([]);
      const [membershipPlans, setMembershipPlans] = useState([]);
      const [showAssignModal, setShowAssignModal] = useState(false);
      const [selectedUserForPlan, setSelectedUserForPlan] = useState(null);
      const [selectedPlanId, setSelectedPlanId] = useState('');
+     const [currentPage, setCurrentPage] = useState(1);
+     const itemsPerPage = 10;
 
      useEffect(() => {
+          setCurrentPage(1);
           if (activeTab === 'dashboard') {
                fetchStats();
           } else if (activeTab === 'inventory') {
@@ -90,15 +91,6 @@ const LibrarianDashboard = () => {
           }
      };
 
-     const fetchPendingUsers = async () => {
-          try {
-               const response = await getPendingUsers();
-               setPendingUsers(response.data);
-          } catch (error) {
-               console.error("Error fetching pending users:", error);
-          }
-     };
-
      const fetchApprovedUsers = async () => {
           try {
                const response = await getApprovedUsers();
@@ -114,29 +106,6 @@ const LibrarianDashboard = () => {
                setMembershipPlans(response.data.filter(plan => plan.active));
           } catch (error) {
                console.error("Error fetching plans:", error);
-          }
-     };
-
-     const handleApprove = async (userId) => {
-          try {
-               await approveUser(userId);
-               alert("User Approved!");
-               fetchPendingUsers();
-               fetchApprovedUsers();
-          } catch (error) {
-               console.error("Error approving user:", error);
-          }
-     };
-
-     const handleReject = async (userId) => {
-          if (window.confirm("Are you sure you want to reject this user?")) {
-               try {
-                    await rejectUser(userId);
-                    alert("User Rejected!");
-                    fetchPendingUsers();
-               } catch (error) {
-                    console.error("Error rejecting user:", error);
-               }
           }
      };
 
@@ -180,6 +149,42 @@ const LibrarianDashboard = () => {
                if (value == null) return false;
                return value.toString().toLowerCase().includes(searchQuery.toLowerCase());
           });
+
+          const getPaginatedData = (dataList) => {
+               const indexOfLast = currentPage * itemsPerPage;
+               const indexOfFirst = indexOfLast - itemsPerPage;
+               return {
+                    currentItems: dataList.slice(indexOfFirst, indexOfLast),
+                    totalPages: Math.ceil(dataList.length / itemsPerPage)
+               };
+          };
+
+          const renderPagination = (totalPages) => {
+               const safeTotalPages = Math.max(totalPages, 1);
+               return (
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '1rem', marginTop: '1rem' }}>
+                         <button
+                              type="button"
+                              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                              disabled={currentPage === 1}
+                              className="btn-primary"
+                              style={{ padding: '0.4rem 0.8rem', opacity: currentPage === 1 ? 0.5 : 1, cursor: currentPage === 1 ? 'not-allowed' : 'pointer' }}
+                         >
+                              Previous
+                         </button>
+                         <span>Page {currentPage} of {totalPages}</span>
+                         <button
+                              type="button"
+                              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                              disabled={currentPage === totalPages}
+                              className="btn-primary"
+                              style={{ padding: '0.4rem 0.8rem', opacity: currentPage === totalPages ? 0.5 : 1, cursor: currentPage === totalPages ? 'not-allowed' : 'pointer' }}
+                         >
+                              Next
+                         </button>
+                    </div>
+               );
+          };
 
           switch (activeTab) {
                case 'issue':
@@ -229,7 +234,8 @@ const LibrarianDashboard = () => {
                               </form>
                          </section>
                     );
-               case 'return':
+               case 'return': {
+                    const { currentItems: currentIssues, totalPages: issuesPages } = getPaginatedData(activeIssuesList);
                     return (
                          <section className="glass-panel" style={{ padding: 'var(--spacing-lg)' }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
@@ -253,10 +259,10 @@ const LibrarianDashboard = () => {
                                              </tr>
                                         </thead>
                                         <tbody>
-                                             {activeIssuesList.length === 0 ? (
+                                             {currentIssues.length === 0 ? (
                                                   <tr><td colSpan="6" style={{ textAlign: 'center' }}>No active book issues found.</td></tr>
                                              ) : (
-                                                  activeIssuesList.map(issue => (
+                                                  currentIssues.map(issue => (
                                                        <tr key={issue.id}>
                                                             <td>#{issue.id}</td>
                                                             <td>
@@ -288,9 +294,12 @@ const LibrarianDashboard = () => {
                                         </tbody>
                                    </table>
                               </div>
+                              {renderPagination(issuesPages)}
                          </section>
                     );
-               case 'memberships':
+               }
+               case 'memberships': {
+                    const { currentItems: currentUsers, totalPages: usersPages } = getPaginatedData(approvedUsers);
                     return (
                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                               <MembershipManagement />
@@ -313,10 +322,10 @@ const LibrarianDashboard = () => {
                                                   </tr>
                                              </thead>
                                              <tbody>
-                                                  {approvedUsers.length === 0 ? (
+                                                  {currentUsers.length === 0 ? (
                                                        <tr><td colSpan="5" style={{ textAlign: 'center' }}>No active users found.</td></tr>
                                                   ) : (
-                                                       approvedUsers.map(user => (
+                                                       currentUsers.map(user => (
                                                             <tr key={user.id}>
                                                                  <td>#U-{user.id}</td>
                                                                  <td>{user.email}</td>
@@ -343,10 +352,13 @@ const LibrarianDashboard = () => {
                                              </tbody>
                                         </table>
                                    </div>
+                                   {renderPagination(usersPages)}
                               </section>
                          </div>
                     );
-               case 'inventory':
+               }
+               case 'inventory': {
+                    const { currentItems: currentBooks, totalPages: booksPages } = getPaginatedData(filteredBooks);
                     return (
                          <section className="glass-panel" style={{ padding: 'var(--spacing-lg)' }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
@@ -369,7 +381,10 @@ const LibrarianDashboard = () => {
                                         type="text"
                                         placeholder={`Search by ${filterAttribute}...`}
                                         value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        onChange={(e) => {
+                                             setSearchQuery(e.target.value);
+                                             setCurrentPage(1);
+                                        }}
                                         style={{ flex: 1, padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', color: 'white', borderRadius: 'var(--radius-md)' }}
                                    />
                               </div>
@@ -390,7 +405,7 @@ const LibrarianDashboard = () => {
                                              {filteredBooks.length === 0 ? (
                                                   <tr><td colSpan="7" style={{ textAlign: 'center' }}>No books found matching criteria.</td></tr>
                                              ) : (
-                                                  filteredBooks.map(book => (
+                                                  currentBooks.map(book => (
                                                        <tr key={book.id}>
                                                             <td>#B-{book.id}</td>
                                                             <td>{book.title}</td>
@@ -409,8 +424,10 @@ const LibrarianDashboard = () => {
                                         </tbody>
                                    </table>
                               </div>
+                              {renderPagination(booksPages)}
                          </section>
                     );
+               }
                default:
                     return (
                          <>
@@ -484,6 +501,32 @@ const LibrarianDashboard = () => {
                          <div className="user-profile">Staff Panel</div>
                     </header>
 
+                    {/* Assign Membership Modal */}
+                    {showAssignModal && selectedUserForPlan && (
+                         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(5px)' }}>
+                              <div className="glass-panel" style={{ padding: '2rem', minWidth: '400px', borderRadius: 'var(--radius-lg)' }}>
+                                   <h3>Assign Plan to {selectedUserForPlan.email}</h3>
+                                   <form onSubmit={submitAssignMembership} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
+                                        <select
+                                             className="input-field"
+                                             value={selectedPlanId}
+                                             onChange={(e) => setSelectedPlanId(e.target.value)}
+                                             required
+                                             style={{ padding: '0.8rem', borderRadius: 'var(--radius-md)', background: 'rgba(255,255,255,0.1)', color: 'white', border: '1px solid var(--glass-border)' }}
+                                        >
+                                             <option value="" style={{ color: 'black' }}>Select a Plan</option>
+                                             {membershipPlans.map(plan => (
+                                                  <option key={plan.id} value={plan.id} style={{ color: 'black' }}>{plan.planName} - ${plan.price}</option>
+                                             ))}
+                                        </select>
+                                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
+                                             <button type="button" onClick={() => setShowAssignModal(false)} style={{ background: 'transparent', color: 'white', border: '1px solid var(--glass-border)', padding: '0.5rem 1rem', borderRadius: 'var(--radius-md)', cursor: 'pointer' }}>Cancel</button>
+                                             <button type="submit" className="btn-primary" style={{ padding: '0.5rem 1rem', cursor: 'pointer' }}>Assign</button>
+                                        </div>
+                                   </form>
+                              </div>
+                         </div>
+                    )}
                     {renderContent()}
                </main>
           </div>
